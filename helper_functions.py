@@ -316,3 +316,125 @@ def plot_functions(
     
     plt.tight_layout()
     return ax
+
+
+def plot_predictions(
+    train_data: Union[np.ndarray, torch.Tensor],
+    train_labels: Union[np.ndarray, torch.Tensor],
+    test_data: Union[np.ndarray, torch.Tensor],
+    test_labels: Union[np.ndarray, torch.Tensor],
+    predictions: Optional[Union[np.ndarray, torch.Tensor]] = None,
+    title: str = "Model Predictions",
+    xlabel: str = "Input Data",
+    ylabel: str = "Target Values",
+    train_color: str = "#1f77b4",  # Seaborn default blue
+    test_color: str = "#2ca02c",   # Seaborn default green
+    pred_color: str = "#d62728",   # Seaborn default red
+    alpha: float = 0.7,
+    s: int = 50,
+    grid: bool = True,
+    ax: Optional[plt.Axes] = None,
+    **kwargs
+):
+    """
+    Beautifully plots training data, test data, and model predictions with modern styling.
+    
+    Args:
+        train_data: Input training data
+        train_labels: Target training values
+        test_data: Input test data
+        test_labels: Target test values
+        predictions: Model predictions on test data
+        title: Plot title
+        xlabel: X-axis label
+        ylabel: Y-axis label
+        train_color: Color for training data points
+        test_color: Color for test data points
+        pred_color: Color for prediction points
+        alpha: Transparency of points
+        s: Size of points
+        grid: Whether to show grid
+        ax: Optional matplotlib axis to plot on
+        **kwargs: Additional styling arguments
+    """
+    plt.style.use('seaborn-v0_8')
+    
+    # Convert torch tensors to numpy if needed
+    if isinstance(train_data, torch.Tensor):
+        train_data = train_data.detach().numpy()
+    if isinstance(train_labels, torch.Tensor):
+        train_labels = train_labels.detach().numpy()
+    if isinstance(test_data, torch.Tensor):
+        test_data = test_data.detach().numpy()
+    if isinstance(test_labels, torch.Tensor):
+        test_labels = test_labels.detach().numpy()
+    if predictions is not None and isinstance(predictions, torch.Tensor):
+        predictions = predictions.detach().numpy()
+    
+    # Create figure and axis if not provided
+    if ax is None:
+        fig, ax = plt.subplots(figsize=(10, 6))
+    
+    # Plot training data
+    train_scatter = ax.scatter(
+        train_data, train_labels,
+        c=train_color,
+        s=s,
+        alpha=alpha,
+        edgecolor='white',
+        linewidth=0.5,
+        label="Training Data",
+        zorder=3,
+        **kwargs
+    )
+    
+    # Plot test data
+    test_scatter = ax.scatter(
+        test_data, test_labels,
+        c=test_color,
+        s=s,
+        alpha=alpha,
+        edgecolor='white',
+        linewidth=0.5,
+        label="Testing Data",
+        zorder=3,
+        **kwargs
+    )
+    
+    # Plot predictions if provided
+    if predictions is not None:
+        pred_scatter = ax.scatter(
+            test_data, predictions,
+            c=pred_color,
+            s=s*1.2,  # Slightly larger for emphasis
+            alpha=min(alpha + 0.1, 1.0),
+            edgecolor='white',
+            linewidth=0.7,
+            label="Predictions",
+            zorder=4,  # Draw on top
+            **kwargs
+        )
+    
+    # Styling
+    ax.set_title(title, fontsize=16, pad=20, fontweight='bold')
+    ax.set_xlabel(xlabel, fontsize=14)
+    ax.set_ylabel(ylabel, fontsize=14)
+    
+    if grid:
+        ax.grid(True, linestyle='--', alpha=0.6)
+    
+    # Clean up spines
+    for spine in ['top', 'right']:
+        ax.spines[spine].set_visible(False)
+    
+    # Add legend
+    ax.legend(
+        loc='upper left',
+        frameon=True,
+        framealpha=0.9,
+        edgecolor='white',
+        facecolor='white'
+    )
+    
+    plt.tight_layout()
+    return ax
