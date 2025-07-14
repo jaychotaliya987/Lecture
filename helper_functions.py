@@ -4,7 +4,8 @@ If a function gets defined once and could be used over and over, it'll go in her
 This functions are taken from a course, https://github.com/mrdbourke/pytorch-deep-learning. (with modifications)
 
 MODIFICATIONS 
-    -Added plot_functions()
+    - Added plot_functions()
+    - Added plot_predictions()
 
 """
 import torch
@@ -327,9 +328,9 @@ def plot_predictions(
     title: str = "Model Predictions",
     xlabel: str = "Input Data",
     ylabel: str = "Target Values",
-    train_color: str = "#1f77b4",  # Seaborn default blue
-    test_color: str = "#2ca02c",   # Seaborn default green
-    pred_color: str = "#d62728",   # Seaborn default red
+    train_color: str = "#185b8b",  # Seaborn default blue
+    test_color: str = "#205a20",   # Seaborn default green
+    pred_color: str = "#891e1e",   # Seaborn default red
     alpha: float = 0.7,
     s: int = 50,
     grid: bool = True,
