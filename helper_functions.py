@@ -4,8 +4,9 @@ If a function gets defined once and could be used over and over, it'll go in her
 This functions are taken from a course, https://github.com/mrdbourke/pytorch-deep-learning. (with modifications)
 
 MODIFICATIONS 
-    - Added plot_functions()
-    - Added plot_predictions()
+    - Added plot_functions
+    - Added plot_predictions
+    - Added Normalize_data
 
 """
 import torch
@@ -71,29 +72,6 @@ def plot_decision_boundary(model: torch.nn.Module, X: torch.Tensor, y: torch.Ten
     plt.scatter(X[:, 0], X[:, 1], c=y, s=40, cmap=plt.cm.RdYlBu) # type: ignore
     plt.xlim(xx.min(), xx.max())
     plt.ylim(yy.min(), yy.max())
-
-
-# Plot linear data or training and test and predictions (optional)
-def plot_predictions(
-    train_data, train_labels, test_data, test_labels, predictions=None
-):
-    """
-  Plots linear training data and test data and compares predictions.
-  """
-    plt.figure(figsize=(10, 7))
-
-    # Plot training data in blue
-    plt.scatter(train_data, train_labels, c="b", s=4, label="Training data")
-
-    # Plot test data in green
-    plt.scatter(test_data, test_labels, c="g", s=4, label="Testing data")
-
-    if predictions is not None:
-        # Plot the predictions in red (predictions were made on the test data)
-        plt.scatter(test_data, predictions, c="r", s=4, label="Predictions")
-
-    # Show the legend
-    plt.legend(prop={"size": 14})
 
 
 # Calculate accuracy (a classification metric)
@@ -439,3 +417,98 @@ def plot_predictions(
     
     plt.tight_layout()
     return ax
+
+
+import numpy as np
+import torch
+import matplotlib.pyplot as plt
+from typing import Union, Optional
+
+def plot_trajectories(
+    true_values: Union[np.ndarray, torch.Tensor],
+    predicted_values: Union[np.ndarray, torch.Tensor],
+    title: str = "True vs Predicted Trajectories",
+    true_color: str = "#205a20",   # Green
+    pred_color: str = "#891e1e",   # Red
+    linewidth: float = 2,
+    grid: bool = True,
+    ax: Optional[plt.Axes] = None,
+):
+    """
+    Plots true and predicted trajectories with automatic x-axis numbering.
+    
+    Args:
+        true_values: Array of true values
+        predicted_values: Array of predicted values
+        title: Plot title
+        true_color: Color for true values line
+        pred_color: Color for predicted values line
+        linewidth: Width of the lines
+        grid: Whether to show grid
+        ax: Optional matplotlib axis to plot on
+    """
+    plt.style.use('seaborn-v0_8')
+    
+    # Convert torch tensors to numpy if needed
+    if isinstance(true_values, torch.Tensor):
+        true_values = true_values.detach().numpy()
+    if isinstance(predicted_values, torch.Tensor):
+        predicted_values = predicted_values.detach().numpy()
+    
+    # Create x-axis values (0 to N-1)
+    x_values = np.arange(len(true_values))
+    
+    # Create figure and axis if not provided
+    if ax is None:
+        fig, ax = plt.subplots(figsize=(10, 6))
+    
+    # Plot true trajectory
+    ax.plot(
+        x_values, true_values,
+        color=true_color,
+        linewidth=linewidth,
+        label="True Values",
+        zorder=3
+    )
+    
+    # Plot predicted trajectory
+    ax.plot(
+        x_values, predicted_values,
+        color=pred_color,
+        linewidth=linewidth,
+        linestyle='--',
+        label="Predicted Values",
+        zorder=4
+    )
+    
+    # Styling
+    ax.set_title(title, fontsize=16, pad=20, fontweight='bold')
+    ax.set_xlabel("Time Step", fontsize=14)
+    ax.set_ylabel("Value", fontsize=14)
+    
+    if grid:
+        ax.grid(True, linestyle='--', alpha=0.6)
+    
+    # Clean up spines
+    for spine in ['top', 'right']:
+        ax.spines[spine].set_visible(False)
+    
+    # Add legend
+    ax.legend(
+        loc='upper left',
+        frameon=True,
+        framealpha=0.9,
+        edgecolor='white',
+        facecolor='white'
+    )
+    
+    plt.tight_layout()
+    return plt
+
+
+def normalize_data(data):
+    """
+    Normalize data while preserving system dynamics, 
+    and centers the data in the range [-1,1]
+    """
+    return (data - data.min()) / (data.max() - data.min()) *2 -1

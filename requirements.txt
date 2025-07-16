@@ -4,3 +4,8 @@ scikit-learn
 matplotlib
 numpy
 pandas
+platform
+requests
+dysts
+numba
+plotly
