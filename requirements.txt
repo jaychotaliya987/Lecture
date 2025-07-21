@@ -9,3 +9,4 @@ requests
 dysts
 numba
 plotly
+ipykernel
